@@ -2,12 +2,12 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-static const char* ssid = "CMDI";
-static const char* password = "cmdi2020";
+static const char* ssid = ""; // fill with wifi name
+static const char* password = ""; // fill with wifi password
 
 static String server = "http://maker.ifttt.com";
-static String eventName = "sleep_monitor_trigger";
-static String IFTTT_Key = "dxqz3s1hMZV-FUHcWqTvKf";
+static String eventName = ""; //fill with event name
+static String IFTTT_Key = ""; // fill with IFTTT key
 
 static unsigned long lastAlertTime = 0;
 static const unsigned long alertCooldown = 10000;
@@ -49,3 +49,4 @@ bool Alert_Send() {
 unsigned long Alert_TimeSinceLast() {
   return millis() - lastAlertTime;
 }
+
