@@ -34,11 +34,13 @@ static i2s_pin_config_t i2s_pins = {
 };
 
 void Mic_Init() {
+  // start up the I2s peripheral
   i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
   i2s_set_pin(I2S_NUM_0, &i2s_pins);
 }
 
 float Mic_ProcessAndGetRMS() {
+  // read from I2S device
   size_t bytes_read;
   i2s_read(I2S_NUM_0, raw_samples, sizeof(raw_samples), &bytes_read, portMAX_DELAY);
 
@@ -50,18 +52,21 @@ float Mic_ProcessAndGetRMS() {
   Serial.println(-PLOT_LIMIT);
 
   for (int i = 0; i < SAMPLE_BUFFER_SIZE && plotted < WINDOW_SAMPLES; i += DECIMATE) {
-    int32_t s = raw_samples[i] >> 16;
-    dc = (dc * 63 + s) >> 6;
-    s -= dc;
-    s *= 50;
+    int32_t s = raw_samples[i] >> 16; // converts sample into singed 16-bit value
+    dc = (dc * 63 + s) >> 6; // estimates DC offset
+    s -= dc; // removes DC offset
+    s *= 50; // applies digital gain
 
+    // Scaling values that exceed plot limit
     if (s > PLOT_LIMIT) s = PLOT_LIMIT;
     if (s < -PLOT_LIMIT) s = -PLOT_LIMIT;
 
     Serial.println(s);
+    // summing squared samples
     sum_sq += (float)s * s;
     plotted++;
   }
 
+  // Return root-mean square amplitude
   return sqrt(sum_sq / plotted);
 }
